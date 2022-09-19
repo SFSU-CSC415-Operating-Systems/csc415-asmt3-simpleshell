@@ -1,3 +1,4 @@
+
 /**************************************************************
 * Class:  CSC-415-03 Fall 2022
 * Name: Mark Kim
@@ -10,7 +11,7 @@
 * Description:
 *
 **************************************************************/
-
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -21,25 +22,38 @@ int main(int argc, char *argv[]) {
     int sh_argc;
     char *sh_argv[BUFFER_SIZE];
     char *token;
-    char prompt[1] = ">";
+    char *prompt;
 
-    if(argc > 1) {
-        printf("Argument: %s\t%lu\n", argv[1], strlen(argv[1]));
-    };
+    if (argc > 1) {
+        prompt = argv[1];
+    } else {
+        prompt = ">";
+    }
+    // if (argc > 1) {
+    //     printf("Argument: %s\tArgument Length:%lu\n", argv[1], strlen(argv[1]));
+    //     prompt = malloc(sizeof(argv[1]));
+    //     memcpy( prompt, argv[1], sizeof(argv[1]));
+    // } else {
+    //     prompt = malloc(1);
+    //     memcpy(prompt, ">", 1);
+    // };
     
     while(1) {
         printf("%s", prompt);
-        if(fgets(buf, BUFFER_SIZE, stdin) = NULL) {
+        if(fgets(buf, BUFFER_SIZE, stdin) == NULL) {
             break;
         }
-        buf[strlen(buf) - 1] = '\0';
+        // buf[strlen(buf) - 1] = '\0';
         token = strtok(buf, " ");
         sh_argc = 0;
         while (token != NULL) {
             sh_argv[sh_argc++] = token;
             token = strtok(NULL, " ");
         }
-        if(strcmp(sh_argv[0], "exit")) {
+
+        printf("This is sh_argv[0]: '%s'", sh_argv[0]);
+
+        if(!strcmp(sh_argv[0], "exit\n")) {
             printf("\nThank you for using my command shell.\n");
             return 0;
         }
