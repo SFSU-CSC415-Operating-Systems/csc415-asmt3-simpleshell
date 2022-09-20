@@ -14,36 +14,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define BUFFER_SIZE  123
 
 int main(int argc, char *argv[]) {
     char buf[BUFFER_SIZE];
     int sh_argc;
-    char *sh_argv[BUFFER_SIZE];
+    char *sh_argv[BUFFER_SIZE/2];
     char *token;
     char *prompt;
+    pid_t c_pid;
 
     if (argc > 1) {
         prompt = argv[1];
     } else {
         prompt = ">";
     }
-    // if (argc > 1) {
-    //     printf("Argument: %s\tArgument Length:%lu\n", argv[1], strlen(argv[1]));
-    //     prompt = malloc(sizeof(argv[1]));
-    //     memcpy( prompt, argv[1], sizeof(argv[1]));
-    // } else {
-    //     prompt = malloc(1);
-    //     memcpy(prompt, ">", 1);
-    // };
     
     while(1) {
         printf("%s", prompt);
         if(fgets(buf, BUFFER_SIZE, stdin) == NULL) {
-            break;
+            printf("\nThank you for using my command shell.\n");
+            return 0;
         }
-        // buf[strlen(buf) - 1] = '\0';
+        buf[strlen(buf) - 1] = '\0';
+        printf("Buffer: '%s'\tBuffer size: %lu\n", buf, sizeof(buf));
         token = strtok(buf, " ");
         sh_argc = 0;
         while (token != NULL) {
@@ -51,16 +49,41 @@ int main(int argc, char *argv[]) {
             token = strtok(NULL, " ");
         }
 
-        printf("This is sh_argv[0]: '%s'", sh_argv[0]);
+        sh_argv[sh_argc++] = NULL;
 
-        if(!strcmp(sh_argv[0], "exit\n")) {
+        printf("sh_argc: %d\n", sh_argc);
+
+        if (sh_argc > BUFFER_SIZE/2) {
+            sh_argc = BUFFER_SIZE/2;
+            sh_argv[sh_argc++] = NULL;
+        }
+
+        if (sh_argv[0] == NULL) {
+            continue;
+        } else if(!strcmp(sh_argv[0], "exit")) {
             printf("\nThank you for using my command shell.\n");
             return 0;
-        }
+        } else {
+            for (int i = 0; i < sh_argc; i++) {
+                printf("sh_argv[%d]: '%s'\n", i, sh_argv[i]);
+            }
 
-        for (int i = 0; i < sh_argc; i++) {
-            printf("%s", sh_argv[i]);
-        }
+            c_pid = fork();
 
+            if ( c_pid < 0 ) {
+                perror("Fork failed: exiting");
+                return (-1);
+            } else if ( c_pid == 0 ) {
+                if(execvp(sh_argv[0], sh_argv) < 0) {
+                    perror("Execvp failed: exiting");
+                    return (-1);
+                }
+            } else {
+                printf("Child PID: %d\n", wait(NULL));
+            }
+        }
+        
     }
+
+    return 0;
 }
