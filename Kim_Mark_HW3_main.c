@@ -1,4 +1,3 @@
-
 /**************************************************************
 * Class:  CSC-415-03 Fall 2022
 * Name: Mark Kim
@@ -26,6 +25,7 @@ int main(int argc, char *argv[]) {
     char *sh_argv[BUFFER_SIZE/2];
     char *token;
     char *prompt;
+    int c_stat;
     pid_t c_pid;
 
     if (argc > 1) {
@@ -36,29 +36,36 @@ int main(int argc, char *argv[]) {
     
     while(1) {
         printf("%s", prompt);
+
         if(fgets(buf, BUFFER_SIZE, stdin) == NULL) {
             printf("\nThank you for using my command shell.\n");
             return 0;
         }
-        buf[strlen(buf) - 1] = '\0';
-        printf("Buffer: '%s'\tBuffer size: %lu\n", buf, sizeof(buf));
-        token = strtok(buf, " ");
+
+        // printf("strlen(buf): %lu\n",strlen(buf));
+
+        if (strlen(buf) >= BUFFER_SIZE - 1) {
+            while(fgetc(stdin) != '\n');
+        }
+
+        // printf("Buffer: '%s'\tBuffer size: %lu\n", buf, sizeof(buf));
+    
+        token = strtok(buf, " \n");
+
         sh_argc = 0;
+
         while (token != NULL) {
             sh_argv[sh_argc++] = token;
-            token = strtok(NULL, " ");
+            printf("Token: '%s'\n", token);
+            token = strtok(NULL, " \n");
         }
 
         sh_argv[sh_argc++] = NULL;
 
-        printf("sh_argc: %d\n", sh_argc);
-
-        if (sh_argc > BUFFER_SIZE/2) {
-            sh_argc = BUFFER_SIZE/2;
-            sh_argv[sh_argc++] = NULL;
-        }
+        // printf("sh_argc: %d\n", sh_argc);
 
         if (sh_argv[0] == NULL) {
+            perror("An empty line was entered. Please try again.");
             continue;
         } else if(!strcmp(sh_argv[0], "exit")) {
             printf("\nThank you for using my command shell.\n");
@@ -79,7 +86,8 @@ int main(int argc, char *argv[]) {
                     return (-1);
                 }
             } else {
-                printf("Child PID: %d\n", wait(NULL));
+                wait(&c_stat);
+                printf("Child %d, exited with %d\n", c_pid, WEXITSTATUS(c_stat));
             }
         }
         
