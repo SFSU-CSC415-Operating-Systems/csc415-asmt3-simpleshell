@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         prompt = argv[1];
     } else {
-        prompt = ">";
+        prompt = "> ";
     }
     
     while(1) {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         // if EOF is reached from fgets, hence shell will exit gracefully per
         // requirements (Error Handling #2 in Requirements.md)
         if(fgets(buf, BUFFER_SIZE, stdin) == NULL) {
-            printf("\nThank you for using my command shell.\n");
+            printf("\nThank you for using my command shell.\n\n");
             return 0;
         }
 
@@ -66,12 +66,11 @@ int main(int argc, char *argv[]) {
         // the argument count. A NULL is placed at the end of the array
         // per man page specifications for execvp.
         // (Requirements #4 & #6 in Requirements.md)
-        token = strtok(buf, " \n\t");
+        token = strtok(buf, " \n\t\"");
         sh_argc = 0;
         while (token != NULL) {
             sh_argv[sh_argc++] = token;
-            printf("Token: '%s'\n", token);
-            token = strtok(NULL, " \n\t");
+            token = strtok(NULL, " \n\t\"");
         }
         sh_argv[sh_argc++] = NULL;
 
@@ -87,7 +86,7 @@ int main(int argc, char *argv[]) {
         // is used to check if the first argument in the argument vector
         // is exit. (Requirement #7 in Requirements.md)
         else if(!strcmp(sh_argv[0], "exit")) {
-            printf("\nThank you for using my command shell.\n");
+            printf("\nThank you for using my command shell.\n\n");
             return 0;
         } else {
             // Per man page specification, fork() returns -1 if it failed,
@@ -97,14 +96,14 @@ int main(int argc, char *argv[]) {
             // Requirements.md)
             c_pid = fork();
             if ( c_pid < 0 ) {
-                perror("Fork failed: exiting");
+                perror("Fork failed: exiting\n");
                 return (-1);
             } else if ( c_pid == 0 ) {
                 // Child process.
                 // Per man page specification, execvp() returns -1 if it fails
                 // this handles that case while executing execvp().
                 if(execvp(sh_argv[0], sh_argv) < 0) {
-                    perror("Execvp failed: exiting");
+                    perror("Execvp failed: exiting\n");
                     return (-1);
                 }
             } else {
