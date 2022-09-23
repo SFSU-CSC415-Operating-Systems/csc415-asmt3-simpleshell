@@ -8,8 +8,8 @@
 * File: Kim_Mark_HW3_main.c
 *
 * Description:
-* This is a simple shell that takes in user input and runs the
-* commands entered along with any command arguments for Linux.
+* This is a simple shell that runs on top of the regular command-
+* line interpreter for Linux.
 *
 **************************************************************/
 #include <stdlib.h>
