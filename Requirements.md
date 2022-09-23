@@ -1,5 +1,6 @@
-Read lines of user input, parse and execute commands by forking/creating new
-processes:
+Requirements:
+0. Read lines of user input, parse and execute commands by forking/creating new
+processes.
 1. Shell shall call `fork()` followed by `execvp()`.
 2. Shell shall wait for child process to complete, then print child PID and the
    return result from the child process.
