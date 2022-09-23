@@ -1,4 +1,5 @@
 Requirements:
+
 0. Read lines of user input, parse and execute commands by forking/creating new
 processes.
 1. Shell shall call `fork()` followed by `execvp()`.
